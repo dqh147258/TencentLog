@@ -43,7 +43,8 @@ class TencentLogWriter(
     private val compressor by lazy { LZ4Factory.fastestInstance().fastCompressor() }
 
     private fun getHttpRequest(logGroupList: Cls.LogGroupList): Request {
-        val body = compressor.compress(logGroupList.toByteArray()).toRequestBody("binary".toMediaTypeOrNull())
+        val body = compressor.compress(logGroupList.toByteArray())
+            .toRequestBody("binary".toMediaTypeOrNull())
         return Request.Builder().apply {
             url(url)
             post(body)
@@ -74,7 +75,10 @@ class TencentLogWriter(
         )
     }
 
-    public fun log(map: Map<String, String>, callback: ((result: String) -> Unit)? = null) {
+    public fun log(
+        map: Map<String, String>,
+        callback: ((result: Boolean, message: String) -> Unit)? = null
+    ) {
         val log = Cls.Log.newBuilder().apply {
             val iterator = map.iterator()
             while (iterator.hasNext()) {
@@ -92,13 +96,16 @@ class TencentLogWriter(
         log(logGrList, callback)
     }
 
-    public fun log(logGroupList: LogGroupList, callback: ((result: String) -> Unit)? = null) {
+    public fun log(
+        logGroupList: LogGroupList,
+        callback: ((result: Boolean, message: String) -> Unit)? = null
+    ) {
         GlobalScope.launch(Dispatchers.Main) {
             val deferred = GlobalScope.async(Dispatchers.IO) {
                 logSync(logGroupList)
             }
             val result = deferred.await()
-            callback?.invoke(result)
+            callback?.invoke(result.isNullOrEmpty(), result)
         }
     }
 
