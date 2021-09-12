@@ -1,6 +1,5 @@
 package com.yxf.tencentlog
 
-import android.util.Log
 import com.yxf.tencentlog.proto.Cls
 import com.yxf.tencentlog.proto.Cls.LogGroup
 import com.yxf.tencentlog.proto.Cls.LogGroupList
@@ -11,11 +10,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import net.jpountz.lz4.LZ4Factory
 import okhttp3.MediaType
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
 
 
 class TencentLogWriter(
@@ -43,8 +40,7 @@ class TencentLogWriter(
     private val compressor by lazy { LZ4Factory.fastestInstance().fastCompressor() }
 
     private fun getHttpRequest(logGroupList: Cls.LogGroupList): Request {
-        val body = compressor.compress(logGroupList.toByteArray())
-            .toRequestBody("binary".toMediaTypeOrNull())
+        val body = RequestBody.create(MediaType.parse("binary"), compressor.compress(logGroupList.toByteArray()))
         return Request.Builder().apply {
             url(url)
             post(body)
@@ -112,7 +108,7 @@ class TencentLogWriter(
     public suspend fun logSync(logGroupList: Cls.LogGroupList): String {
         val request = getHttpRequest(logGroupList)
         val response = httpClient.newCall(request).execute()
-        return response.body?.string() ?: ""
+        return response.body()?.string() ?: ""
     }
 
 
