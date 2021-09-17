@@ -40,3 +40,23 @@
         }
     }
 ```
+
+## 注意
+这里使用的protobuf库是`protobuf-javalite`
+
+如果你使用的其它库(protobuf-java,protobuf-lite)则需要将其它的库排除掉,不然编译将会报错.
+以`protobuf-lite`为例,在app的build.gradle中添加如下配置
+
+```groovy
+android {
+        //...
+        configurations {
+            implementation.exclude module:'protobuf-lite'
+        }
+}
+```
+
+如果项目中不能使用`protobuf-javalite`,请下载源码自行编译腾讯云结构化日志的proto文件,然后替换其中的Cls.java
+
+
+
