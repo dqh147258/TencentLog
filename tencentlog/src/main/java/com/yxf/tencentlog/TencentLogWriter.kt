@@ -121,13 +121,14 @@ class TencentLogWriter(
             result =  response.body()?.string() ?: ""
         } catch (se: SocketTimeoutException) {
             Log.w(TAG, "write failed caused by socket time out", se)
+            result = "write log failed cause by ${se.message}"
         } catch (uhe: UnknownHostException){
+            result = "write log failed cause by ${uhe.message}"
             Log.w(TAG, "write failed", uhe)
         }
         finally {
+            //注意,result不为空表示出错,上传失败
             return result
         }
     }
-
-
 }
