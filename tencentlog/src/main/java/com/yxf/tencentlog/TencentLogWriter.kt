@@ -1,5 +1,6 @@
 package com.yxf.tencentlog
 
+import android.util.Log
 import com.yxf.tencentlog.proto.Cls
 import com.yxf.tencentlog.proto.Cls.LogGroup
 import com.yxf.tencentlog.proto.Cls.LogGroupList
@@ -13,6 +14,8 @@ import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 
 
 class TencentLogWriter(
@@ -30,6 +33,8 @@ class TencentLogWriter(
         }
     }
 
+    private val TAG = TencentLogWriter::class.java.simpleName
+
     private val domain = if (isIntranet) "cls.tencentyun.com" else "cls.tencentcs.com"
     private val host = "${area}.$domain"
 
@@ -40,7 +45,10 @@ class TencentLogWriter(
     private val compressor by lazy { LZ4Factory.fastestInstance().fastCompressor() }
 
     private fun getHttpRequest(logGroupList: Cls.LogGroupList): Request {
-        val body = RequestBody.create(MediaType.parse("binary"), compressor.compress(logGroupList.toByteArray()))
+        val body = RequestBody.create(
+            MediaType.parse("binary"),
+            compressor.compress(logGroupList.toByteArray())
+        )
         return Request.Builder().apply {
             url(url)
             post(body)
@@ -71,7 +79,7 @@ class TencentLogWriter(
         )
     }
 
-    public fun log(
+    fun log(
         map: Map<String, String>,
         callback: ((result: Boolean, message: String) -> Unit)? = null
     ) {
@@ -92,7 +100,7 @@ class TencentLogWriter(
         log(logGrList, callback)
     }
 
-    public fun log(
+    fun log(
         logGroupList: LogGroupList,
         callback: ((result: Boolean, message: String) -> Unit)? = null
     ) {
@@ -105,10 +113,20 @@ class TencentLogWriter(
         }
     }
 
-    public suspend fun logSync(logGroupList: Cls.LogGroupList): String {
-        val request = getHttpRequest(logGroupList)
-        val response = httpClient.newCall(request).execute()
-        return response.body()?.string() ?: ""
+    suspend fun logSync(logGroupList: Cls.LogGroupList): String {
+        var result = ""
+        try {
+            val request = getHttpRequest(logGroupList)
+            val response = httpClient.newCall(request).execute()
+            result =  response.body()?.string() ?: ""
+        } catch (se: SocketTimeoutException) {
+            Log.w(TAG, "write failed caused by socket time out", se)
+        } catch (uhe: UnknownHostException){
+            Log.w(TAG, "write failed", uhe)
+        }
+        finally {
+            return result
+        }
     }
 
 
