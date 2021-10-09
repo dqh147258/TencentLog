@@ -15,7 +15,7 @@
 
 ```groovy
 	dependencies {
-	        implementation 'com.github.dqh147258:TencentLog:1.0.5'
+	        implementation 'com.github.dqh147258:TencentLog:1.0.7'
 	}
 ```
 
@@ -56,7 +56,13 @@ android {
 }
 ```
 
-如果项目中不能使用`protobuf-javalite`,请下载源码自行编译腾讯云结构化日志的proto文件,然后替换其中的Cls.java
+如果项目中有使用到`protobuf-java`,请使用
+```groovy
+	dependencies {
+	        implementation 'com.github.dqh147258:TencentLog:2.0.+'
+	}
+```
+源码是`protobuf-java`分支
 
 
 
