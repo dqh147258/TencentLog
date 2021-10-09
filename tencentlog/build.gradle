@@ -7,12 +7,12 @@ apply plugin: 'com.github.dcendents.android-maven'
 group='com.github.dqh147258'
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 30
     buildToolsVersion "30.0.3"
 
     defaultConfig {
         minSdkVersion 19
-        targetSdkVersion 31
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
 
@@ -40,7 +40,8 @@ dependencies {
 
 
     implementation "com.squareup.okhttp3:okhttp:3.9.1"
-    implementation 'com.google.protobuf:protobuf-javalite:3.9.1'
+    implementation 'com.google.protobuf:protobuf-java:3.17.3'
+    //implementation 'com.google.protobuf:protobuf-javalite:3.9.1'
     //implementation 'com.google.protobuf:protobuf-lite:3.0.1'
 
     implementation group: 'commons-codec', name: 'commons-codec', version: '1.15'
