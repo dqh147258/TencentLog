@@ -40,7 +40,7 @@ dependencies {
 
 
     implementation "com.squareup.okhttp3:okhttp:3.9.1"
-    implementation 'com.google.protobuf:protobuf-java:3.17.3'
+    implementation 'com.google.protobuf:protobuf-java:3.0.0'
     //implementation 'com.google.protobuf:protobuf-javalite:3.9.1'
     //implementation 'com.google.protobuf:protobuf-lite:3.0.1'
 
